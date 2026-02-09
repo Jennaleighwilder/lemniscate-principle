@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="The Lemniscate Principle: Saddle-Point Dynamics and the Universal Topology of Adaptive Transformation. Interactive computational model by Jennifer Leigh West.">
+<meta name="author" content="Jennifer Leigh West">
+<meta property="og:title" content="The Lemniscate Principle — West (2026)">
+<meta property="og:description" content="Interactive proof that the moment of greatest consequence is the moment of least visibility. Lyapunov stability theory applied to bistable adaptive systems.">
+<meta property="og:type" content="article">
+<title>West's Lemniscate Principle — Revised v2.0</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=JetBrains+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap');
+
+:root {
+  --bg: #060606;
+  --paper: #0b0a09;
+  --text: #c8c2b8;
+  --dim: #6e6a62;
+  --gold: #a8935e;
+  --gold-bright: #d4af37;
+  --red: #7a3333;
+  --red-bright: #a84a4a;
+  --blue: #3a5a7a;
+  --blue-bright: #5a8aba;
+  --green: #3a6a4a;
+  --white: #e8e2d8;
+  --cream: #f0ebe0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Pro', 'EB Garamond', Georgia, serif;
+  font-size: 19px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 10000;
+}
+
+.container {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 80px 40px 120px;
+}
+
+/* ── HEADER ── */
+.header {
+  text-align: center;
+  padding-bottom: 60px;
+  margin-bottom: 60px;
+  border-bottom: 1px solid rgba(168, 147, 94, 0.15);
+}
+
+.header h1 {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 2.6em;
+  font-weight: 600;
+  color: var(--cream);
+  letter-spacing: 0.015em;
+  line-height: 1.15;
+  margin-bottom: 14px;
+}
+
+.header .subtitle {
+  font-size: 1.1em;
+  font-style: italic;
+  color: var(--gold);
+  margin-bottom: 35px;
+  font-weight: 300;
+}
+
+.header .meta {
+  font-size: 0.88em;
+  color: var(--dim);
+  line-height: 1.6;
+}
+
+.header .meta strong { color: var(--text); }
+
+/* ── ABSTRACT ── */
+.abstract {
+  background: rgba(168, 147, 94, 0.03);
+  border-left: 2px solid var(--gold);
+  padding: 30px 35px;
+  margin-bottom: 55px;
+  font-size: 0.95em;
+}
+
+.abstract .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+
+.abstract p { color: var(--text); margin-bottom: 12px; }
+.abstract p:last-child { margin-bottom: 0; }
+
+/* ── SECTIONS ── */
+h2 {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.45em;
+  font-weight: 600;
+  color: var(--cream);
+  margin-top: 60px;
+  margin-bottom: 22px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(168, 147, 94, 0.12);
+}
+
+h3 {
+  font-size: 1.08em;
+  font-weight: 600;
+  color: var(--gold);
+  margin-top: 35px;
+  margin-bottom: 14px;
+}
+
+p { margin-bottom: 18px; }
+
+em.k { color: var(--gold); font-style: italic; }
+strong.w { color: var(--cream); }
+
+/* ── MATH BLOCKS ── */
+.math {
+  background: rgba(8, 8, 8, 0.95);
+  border: 1px solid rgba(168, 147, 94, 0.1);
+  padding: 24px 28px;
+  margin: 24px 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78em;
+  line-height: 2;
+  color: var(--cream);
+  overflow-x: auto;
+  border-radius: 1px;
+}
+
+.math .c { color: var(--dim); font-style: italic; }
+.math .g { color: var(--gold); }
+.math .r { color: var(--red-bright); }
+.math .b { color: var(--blue-bright); }
+
+/* ── THEOREM / DEFINITION / PROOF / COROLLARY / REMARK ── */
+.block {
+  padding: 24px 28px;
+  margin: 28px 0;
+}
+
+.block .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7em;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.block p { margin-bottom: 10px; }
+.block p:last-child { margin-bottom: 0; }
+
+.def {
+  background: rgba(168, 147, 94, 0.03);
+  border: 1px solid rgba(168, 147, 94, 0.1);
+}
+.def .label { color: var(--gold); }
+
+.thm {
+  background: rgba(122, 51, 51, 0.05);
+  border-left: 3px solid var(--red);
+}
+.thm .label { color: var(--red-bright); }
+.thm p { color: var(--cream); }
+
+.proof {
+  background: rgba(58, 90, 122, 0.04);
+  border-left: 3px solid var(--blue);
+}
+.proof .label { color: var(--blue-bright); }
+
+.cor {
+  background: rgba(58, 106, 74, 0.04);
+  border-left: 3px solid var(--green);
+}
+.cor .label { color: var(--green); }
+
+.remark {
+  background: rgba(168, 147, 94, 0.02);
+  border-left: 3px solid var(--dim);
+}
+.remark .label { color: var(--dim); }
+
+/* ── TABLE ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 0.88em;
+}
+
+th {
+  text-align: left;
+  padding: 11px 14px;
+  border-bottom: 2px solid rgba(168, 147, 94, 0.2);
+  color: var(--gold);
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+td {
+  padding: 9px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+/* ── CANVAS ── */
+.fig {
+  background: var(--paper);
+  border: 1px solid rgba(168, 147, 94, 0.1);
+  margin: 35px 0;
+  padding: 20px;
+}
+
+.fig canvas { width: 100%; display: block; }
+
+.fig-cap {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68em;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+  text-align: center;
+  margin-top: 14px;
+}
+
+/* ── CONTROLS ── */
+.controls {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+  flex-wrap: wrap;
+}
+
+.ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.ctrl label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65em;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+}
+
+.ctrl input[type="range"] {
+  -webkit-appearance: none;
+  width: 130px;
+  height: 2px;
+  background: rgba(168, 147, 94, 0.25);
+  outline: none;
+}
+
+.ctrl input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+}
+
+.ctrl-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72em;
+  color: var(--gold-bright);
+}
+
+/* ── READOUTS ── */
+.readout {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.readout-item {
+  text-align: center;
+  padding: 10px 8px;
+  background: rgba(8, 8, 8, 0.7);
+  border: 1px solid rgba(168, 147, 94, 0.08);
+}
+
+.readout-item .rl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6em;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+}
+
+.readout-item .rv {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.15em;
+  color: var(--gold-bright);
+  margin-top: 3px;
+}
+
+.phase-badge {
+  text-align: center;
+  margin: 12px 0;
+}
+
+.phase-badge span {
+  display: inline-block;
+  padding: 6px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  background: rgba(168, 147, 94, 0.06);
+}
+
+/* ── CODE ── */
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82em;
+  color: var(--gold);
+  background: rgba(168, 147, 94, 0.07);
+  padding: 2px 5px;
+  border-radius: 1px;
+}
+
+/* ── REFS ── */
+.refs {
+  margin-top: 65px;
+  padding-top: 30px;
+  border-top: 1px solid rgba(168, 147, 94, 0.15);
+}
+
+.refs .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--gold);
+  margin-bottom: 18px;
+}
+
+.ref {
+  font-size: 0.82em;
+  color: var(--dim);
+  margin-bottom: 7px;
+  padding-left: 28px;
+  text-indent: -28px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .container { padding: 40px 20px 80px; }
+  .header h1 { font-size: 1.8em; }
+  .readout { grid-template-columns: repeat(2, 1fr); }
+  .controls { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- HEADER -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="header">
+  <h1>The Lemniscate Principle</h1>
+  <div class="subtitle">Saddle-Point Dynamics and the Universal Topology of Adaptive Transformation</div>
+  <div class="meta">
+    <strong>Jennifer Leigh West</strong><br>
+    The Forgotten Code Research Institute · Tennessee, USA<br>
+    <em>Revised Working Paper v3.0 — February 2026</em><br>
+    <em style="font-size:0.9em; color:var(--dim);">Incorporating Lyapunov stability foundations per second peer review</em>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ABSTRACT -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="abstract">
+  <div class="label">Abstract</div>
+  <p>We demonstrate that adaptive systems possessing bistable energy landscapes — systems with two quasi-stable modes and a saddle-point separating them — produce phase-space trajectories topologically equivalent to the lemniscate (∞) when projected onto the two-dimensional energy-partition plane. This figure-eight topology is not a metaphor or diagrammatic convenience but a mathematical consequence of Hamiltonian flow near homoclinic orbits in double-well potentials, a structure documented in classical mechanics since Poincaré.</p>
+  <p>We prove that at the saddle point (the nodal crossing of the figure-eight), the maximum Lyapunov exponent — the rate at which infinitesimally different systems diverge toward different futures — reaches its global maximum, while observable displacement is zero. This <em class="k">Saddle Dominance Theorem</em> is derived from the Jacobian of Hamilton's equations and is a property of the dynamics, not the parameterization. We further prove that the maximum of raw kinetic energy occurs <em>within</em> each lobe, not at the saddle — a correction from v1.0 that strengthens the theory by shifting its foundation from speed to sensitivity: the saddle is not where the system moves fastest, but where its future is most completely determined by its present state. We formalize seven dynamical phases corresponding to positions on the separatrix, show their correspondence across quantum, cellular, neural, and developmental systems, and provide a computational model validated against three independent engines (AIRMED, The Loom, Harmonic Cognition Engine) previously built by the author without knowledge of the unifying framework.</p>
+  <p>The central claim is bounded: we do not assert that all oscillatory systems are lemniscate-shaped. We assert that the specific and common class of <em class="k">bistable adaptive systems undergoing mode transition</em> necessarily produces this topology, and that this class is far broader than currently recognized.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 1. INTRODUCTION -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>1. Introduction: The Problem of Unrecognized Structural Identity</h2>
+
+<p>In 1963, Edward Lorenz discovered that a simplified model of atmospheric convection produced a strange attractor — a butterfly-shaped figure in phase space. When projected onto two dimensions, the Lorenz attractor traces a path that alternates between two lobes, passing through a central region with each transition. The projection is a figure-eight.</p>
+
+<p>In 1952, Alan Hodgkin and Andrew Huxley modeled the action potential of a neuron as a system with two stable states (resting and firing) separated by a threshold. The phase portrait of the Hodgkin-Huxley model, when projected onto voltage and recovery variables, exhibits excursions between two regions connected through a saddle zone. The topology is a figure-eight.</p>
+
+<p>In developmental psychology, every major stage theory — Piaget, Erikson, Kübler-Ross, Campbell's monomyth — describes a cycle that passes through crisis (dissolution of old structure), transition (reorganization), and emergence (new stable state). Mapped onto a stability-change plane, the trajectory alternates between two qualitatively distinct modes. The topology is a figure-eight.</p>
+
+<p>These are not analogies. They are instances of the same mathematical structure: <em class="k">the separatrix of a double-well potential</em>. This paper formalizes that structure, proves its velocity properties from first principles, and argues that the class of systems exhibiting it — bistable adaptive systems undergoing mode transition — constitutes a universal category spanning physics, biology, computation, and human experience.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 2. THE DYNAMICAL SYSTEM -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>2. The Dynamical System</h2>
+
+<h3>2.1 The Double-Well Hamiltonian</h3>
+
+<p>We begin where the previous version of this paper should have begun: with a specific, well-defined dynamical system whose solution curves produce the lemniscate.</p>
+
+<p>Consider a one-dimensional particle of unit mass in a double-well potential:</p>
+
+<div class="math">
+<span class="g">V(x) = -½αx² + ¼βx⁴</span>
+
+<span class="c">where α, β > 0 are positive constants</span>
+
+<span class="c">This potential has:</span>
+  — a local maximum (saddle point) at x = 0, where V(0) = 0
+  — two minima (wells) at x = ±√(α/β), where V = -α²/(4β)
+</div>
+
+<p>The Hamiltonian of this system is:</p>
+
+<div class="math">
+<span class="g">H(x, p) = ½p² + V(x) = ½p² - ½αx² + ¼βx⁴</span>
+
+<span class="c">where p = dx/dt is the momentum (velocity, since m = 1)</span>
+<span class="c">Hamilton's equations:</span>
+  <span class="g">dx/dt = ∂H/∂p = p</span>
+  <span class="g">dp/dt = -∂H/∂V = αx - βx³</span>
+</div>
+
+<p>This is not a constructed example. It is the <strong class="w">canonical model of bistability</strong> in physics, used to describe phase transitions, symmetry breaking, tunneling in quantum mechanics, and bifurcation in nonlinear dynamics. It appears in Strogatz [2], Guckenheimer & Holmes [7], Landau & Lifshitz [11], and hundreds of other standard references.</p>
+
+<h3>2.2 The Separatrix Is a Lemniscate</h3>
+
+<p>The phase portrait of this system — the set of all trajectories in the (x, p) plane — contains three qualitatively distinct types of orbit:</p>
+
+<div class="block def">
+  <div class="label">Definition 1 — Three Orbit Types</div>
+  <p><strong class="w">Type I (Trapped):</strong> Orbits with H &lt; 0. The particle oscillates within one well. These are simple closed loops (ellipse-like) centered on one minimum. The system is in a single stable mode.</p>
+  <p><strong class="w">Type II (Free):</strong> Orbits with H &gt; 0. The particle has enough energy to traverse both wells. These are large closed loops enclosing both minima. The system moves freely between modes.</p>
+  <p><strong class="w">Type III (Separatrix):</strong> The orbit with H = 0 exactly. This is the <em class="k">boundary</em> between trapped and free behavior. It passes through the saddle point at the origin. <strong class="w">Its shape is a figure-eight — a lemniscate.</strong></p>
+</div>
+
+<p>To see this explicitly, set H = 0:</p>
+
+<div class="math">
+½p² - ½αx² + ¼βx⁴ = 0
+
+<span class="g">p² = αx² - ½βx⁴</span>
+<span class="g">p = ±x√(α - ½βx²)</span>
+
+<span class="c">This curve self-intersects at (x, p) = (0, 0) — the saddle point.</span>
+<span class="c">It forms two symmetric lobes, one for x > 0 and one for x < 0.</span>
+<span class="c">Its topology is that of the lemniscate of Bernoulli.</span>
+</div>
+
+<div class="block remark">
+  <div class="label">Remark — On Self-Intersection and Uniqueness</div>
+  <p>A legitimate concern (raised in peer review) is that ODE uniqueness theorems forbid trajectory crossings in state space. This is correct for regular points. However, the saddle point (0, 0) is a <em class="k">fixed point</em> of the system — a point where dx/dt = dp/dt = 0. The uniqueness theorem does not apply at fixed points in the same way: the separatrix approaches the saddle asymptotically, taking infinite time to reach it. The "crossing" is a topological feature of the global phase portrait, not a violation of local uniqueness. This is standard in dynamical systems theory; see Strogatz [2] §6.4 or Guckenheimer & Holmes [7] §1.6.</p>
+</div>
+
+<h3>2.3 The Physical Meaning of the Two Wells</h3>
+
+<p>In an adaptive system, the two wells of the potential correspond to two quasi-stable modes of operation:</p>
+
+<table>
+  <thead>
+    <tr><th>Domain</th><th>Well A</th><th>Well B</th><th>Saddle (Crossing)</th></tr>
+  </thead>
+  <tbody>
+    <tr><td style="color:var(--gold)">Quantum</td><td>Ground state</td><td>Excited state</td><td>Transition energy</td></tr>
+    <tr><td style="color:var(--gold)">Cellular</td><td>Quiescent (G₀/G₁)</td><td>Proliferative (S/M)</td><td>Restriction point</td></tr>
+    <tr><td style="color:var(--gold)">Neural</td><td>Resting potential</td><td>Action potential</td><td>Firing threshold</td></tr>
+    <tr><td style="color:var(--gold)">Neural net</td><td>Loss basin A</td><td>Loss basin B</td><td>Saddle in loss landscape</td></tr>
+    <tr><td style="color:var(--gold)">Ecological</td><td>Regime A</td><td>Regime B</td><td>Tipping point</td></tr>
+    <tr><td style="color:var(--gold)">Psychological</td><td>Old identity</td><td>New identity</td><td>Crisis / liminal space</td></tr>
+    <tr><td style="color:var(--gold)">Economic</td><td>Bear market</td><td>Bull market</td><td>Regime transition</td></tr>
+    <tr><td style="color:var(--gold)">Menstrual</td><td>Follicular mode</td><td>Luteal mode</td><td>Ovulation / menstruation</td></tr>
+  </tbody>
+</table>
+
+<p>In each case, the system has two stable configurations and a threshold between them. The separatrix — the figure-eight — is the trajectory of a system that has <em class="k">exactly enough energy to leave one mode but not enough to settle permanently into the other</em>. It is the path of transformation itself.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 3. THE NODAL VELOCITY THEOREM -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>3. The Saddle Dominance Theorem</h2>
+
+<p>This is the central result. It concerns not speed in the naive sense, but something deeper: the rate at which the system's <em>fate is determined</em>.</p>
+
+<h3>3.1 Three Properties of the Saddle Point</h3>
+
+<p>The saddle point of the double-well system possesses three distinct mathematical properties, each proven independently, which together produce the central insight of this framework.</p>
+
+<div class="block thm">
+  <div class="label">Theorem 1a — Maximum Lyapunov Instability at the Saddle</div>
+  <p>The maximum Lyapunov exponent of the double-well system achieves its global maximum at the saddle point (x, p) = (0, 0). That is: the rate at which infinitesimally close trajectories diverge from one another is greatest at the saddle.</p>
+</div>
+
+<div class="block proof">
+  <div class="label">Proof</div>
+  <p>The Jacobian of Hamilton's equations dx/dt = p, dp/dt = αx - βx³ is:</p>
+  <p style="font-family:'JetBrains Mono',monospace; font-size:0.85em; color:var(--cream); margin: 12px 0;">J(x, p) = [[0, 1], [α - 3βx², 0]]</p>
+  <p>At the saddle (0, 0): J = [[0, 1], [α, 0]], with eigenvalues λ = ±√α. The positive eigenvalue √α is the local Lyapunov exponent — the exponential rate of trajectory divergence.</p>
+  <p>At the well bottoms x = ±√(α/β): J = [[0, 1], [-2α, 0]], with eigenvalues λ = ±i√(2α) — purely imaginary. The Lyapunov exponent is zero. Nearby trajectories neither converge nor diverge; they orbit.</p>
+  <p>At any other point on the separatrix, the linearization yields eigenvalues with real parts bounded between 0 and √α. Therefore the saddle point is the global maximum of the positive Lyapunov exponent over the entire phase space. ∎</p>
+</div>
+
+<div class="block remark">
+  <div class="label">Remark — What This Means in Plain Language</div>
+  <p>Two systems that are nearly identical — differing by the smallest measurable amount — will diverge from each other <em>fastest</em> when they are both near the saddle. At the well bottoms (the "stable" regions), nearly identical systems stay nearly identical. At the saddle, a whisper of difference becomes a shout. The saddle is where <em class="k">fate is decided</em>: which lobe the system enters next, which mode it adopts, which future it selects. This is the mathematical definition of a transformative moment — not the moment of greatest speed, but the moment of greatest <em>sensitivity</em>.</p>
+</div>
+
+<div class="block thm">
+  <div class="label">Theorem 1b — Maximum Kinetic Energy Within Lobes</div>
+  <p>Along the separatrix (H = 0), kinetic energy ½p² achieves its maximum at x² = α/β (within each lobe, not at the saddle), with value ½p²_max = α²/(4β). At the saddle, kinetic energy is zero (the particle approaches asymptotically). For perturbed trajectories (H = ε > 0), the system passes through the saddle region with finite speed |p| ≈ √(2ε), and the maximum speed still occurs within the lobes.</p>
+</div>
+
+<div class="block proof">
+  <div class="label">Proof</div>
+  <p>On H = 0: p² = αx² - ½βx⁴ = x²(α - ½βx²). Maximizing: d(p²)/dx = 2x(α - βx²) = 0 at x = 0 or x² = α/β. At x² = α/β: p² = α²/(2β), so ½p² = α²/(4β). At x = 0: p² = 0. The maximum speed occurs at the steepest descent of the potential within the lobe, not at the saddle. ∎</p>
+</div>
+
+<div class="block remark">
+  <div class="label">Remark — Why This Does Not Weaken the Theory</div>
+  <p>Version 1.0 of this paper incorrectly claimed maximum velocity at the saddle. A peer reviewer identified this error. The corrected result is <em>more powerful</em>, not less: the saddle's importance lies not in raw speed but in something velocity cannot capture. A car going 100 mph on a straight highway is fast but trivial — its trajectory is determined. A car going 30 mph at a fork in the road is slower but consequential — its future is being decided. The saddle is the fork. What is maximized there is not speed but <em>the rate at which infinitesimal differences produce macroscopic consequences</em>. In dynamical systems, this quantity — the Lyapunov exponent — is the fundamental measure of a system's sensitivity to its own state. The saddle is where the system is most alive to itself.</p>
+</div>
+
+<div class="block thm">
+  <div class="label">Theorem 1c — Zero Observable Displacement at Maximum Sensitivity</div>
+  <p>At the saddle point, the system's displacement from the inter-modal boundary is zero: |x| = 0. Simultaneously, the Lyapunov exponent is maximal (Theorem 1a). Therefore, the moment of greatest transformational sensitivity coincides with the moment of least observable deviation from apparent equilibrium.</p>
+</div>
+
+<div class="block cor">
+  <div class="label">Corollary 1 — The Invisibility of Transformation</div>
+  <p>A system at the saddle point is maximally sensitive to perturbation (Theorem 1a) while exhibiting zero displacement from apparent equilibrium (Theorem 1c). To an observer measuring displacement — "how different does this look from normal?" — the system appears unchanged. To an observer measuring the Lyapunov exponent — "how much does the system's future depend on what happens right now?" — the system is at peak criticality. The moment of greatest consequence is the moment of least visibility. This is not a metaphorical observation. It is a mathematical identity: max(λ₁) occurs at min(|x|) along the separatrix.</p>
+</div>
+
+<div class="block cor">
+  <div class="label">Corollary 1a — The Fundamental Observational Paradox</div>
+  <p>Conversely, at the flare point (maximum |x|, the turning point of a lobe), the Lyapunov exponent is zero — nearby trajectories are locally parallel, the system's future is locally determined, and no perturbation can alter the mode. The flare is the moment of maximum visibility and minimum consequence. The crisis that everyone sees is the moment that matters least. The quiet that nobody sees is the moment that matters most. This is the central claim of the Lemniscate Principle, and it is now grounded in Lyapunov stability theory, not velocity.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 4. UNIVERSALITY: SCOPE AND LIMITS -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>4. Universality: Scope and Limits</h2>
+
+<p>The previous version of this paper claimed universality for "all adaptive systems." The reviewer was right to push back. We now state the scope precisely.</p>
+
+<div class="block thm">
+  <div class="label">Theorem 2 — Bistable Separatrix Theorem</div>
+  <p>Any system satisfying the following four conditions produces a separatrix with lemniscate topology in its phase portrait:</p>
+  <p><strong class="w">C1 (Hamiltonian or near-Hamiltonian):</strong> The system possesses a conserved or slowly-varying energy-like quantity H.</p>
+  <p><strong class="w">C2 (Bistability):</strong> The effective potential V has (at least) two local minima separated by a saddle point.</p>
+  <p><strong class="w">C3 (Sufficient dimensionality):</strong> The state space is at least two-dimensional (position + velocity, or stored energy + active energy, etc.).</p>
+  <p><strong class="w">C4 (Continuity):</strong> The vector field is continuous in the neighborhood of the saddle.</p>
+</div>
+
+<div class="block proof">
+  <div class="label">Proof Sketch</div>
+  <p>Under C1–C4, the saddle point of V generates a hyperbolic fixed point in the phase portrait (a saddle in the (x, p) plane). By the Stable Manifold Theorem [7], the stable and unstable manifolds of this saddle point form smooth curves that, under C2, connect back to the saddle (homoclinic orbits) enclosing each well. These homoclinic orbits together form a figure-eight: two loops sharing a single point. The resulting curve is topologically a lemniscate. ∎</p>
+</div>
+
+<p>The question of universality thus reduces to: <em class="k">how many adaptive systems are bistable?</em></p>
+
+<p>The answer, supported by extensive literature across disciplines, is: far more than currently recognized.</p>
+
+<h3>4.1 Prevalence of Bistability</h3>
+
+<p>Bistable (and multistable) dynamics have been documented in:</p>
+
+<p><strong class="w">Physics:</strong> Ferromagnetic phase transitions, superconducting Josephson junctions, laser mode switching, quantum double-well tunneling [11, 12].</p>
+
+<p><strong class="w">Biology:</strong> Gene regulatory switches (lac operon, λ-phage lysis/lysogeny), cell fate decisions, apoptosis/survival, ecological regime shifts, neural bistability in perception and decision-making [13, 14, 15].</p>
+
+<p><strong class="w">Neuroscience:</strong> Hodgkin-Huxley and FitzHugh-Nagumo models of neural firing, bistable perception (Necker cube, binocular rivalry), UP/DOWN states in cortical neurons [16, 17].</p>
+
+<p><strong class="w">Machine Learning:</strong> Loss landscape saddle points (which dominate optimization in high-dimensional networks [18]), mode collapse/recovery in GANs, catastrophic forgetting/recovery in continual learning [19].</p>
+
+<p><strong class="w">Psychology:</strong> Stage transitions (every developmental stage theory implies bistability between old and new stages), grief processing, identity transformation, addiction/recovery [20].</p>
+
+<p><strong class="w">Economics:</strong> Market regime switching, currency crises, bank runs (Diamond-Dybvig model), poverty traps [21].</p>
+
+<div class="block remark">
+  <div class="label">Remark — What This Paper Does NOT Claim</div>
+  <p>We do not claim that all oscillatory systems produce figure-eights. Simple harmonic oscillators produce ellipses. Limit cycles produce closed loops. Chaotic systems produce strange attractors. The lemniscate topology is specific to <em>bistable systems at the separatrix energy</em> — systems at the threshold of mode transition. This is a large and important class, but not all systems.</p>
+  <p>We also do not claim that real systems follow the separatrix exactly. Real systems are perturbed (H = ε ≠ 0), noisy, and dissipative. The separatrix is the <em>organizing structure</em> around which real trajectories cluster during mode transitions. Its topology shapes the dynamics even when the exact orbit is not followed — just as a mountain pass shapes the path of water even when no drop follows the exact watershed line.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 5. THE SEVEN PHASES -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>5. The Seven Phases of Separatrix Transit</h2>
+
+<p>A system traversing the lemniscate separatrix passes through seven dynamically distinct regions. These are not imposed categories but emergent from the velocity, energy partition, and curvature profiles of the trajectory.</p>
+
+<div class="math">
+<span class="c">Parameterize by arc length s along one lobe of the separatrix.</span>
+<span class="c">Let s = 0 at the saddle, s = s_max at the turning point.</span>
+
+<span class="g">Phase 1: CROSSING</span>        s ≈ 0
+  Lyapunov exponent → max. Displacement ≈ 0.
+  <span class="c">The system passes between modes. Maximum sensitivity to perturbation.</span>
+  <span class="c">The smallest input here produces the largest difference in outcome.</span>
+  <span class="c">Observable: nothing. Consequential: everything.</span>
+
+<span class="g">Phase 2: HOMEOSTASIS</span>     s ∈ (0, s_max/6]
+  Newly entered lobe. Velocity still high, displacement growing.
+  <span class="c">The "fresh start." The system is accelerating into new territory.</span>
+
+<span class="g">Phase 3: DRIFT</span>           s ∈ (s_max/6, s_max/3]
+  Displacement increasing, velocity beginning to decrease.
+  <span class="c">Perturbations accumulate. The system hasn't noticed yet.</span>
+
+<span class="g">Phase 4: INSULT</span>          s ∈ (s_max/3, s_max/2]
+  Velocity drops significantly. Energy converting to potential.
+  <span class="c">The system recognizes disruption. Things feel "off."</span>
+
+<span class="g">Phase 5: FLARE</span>           s ≈ s_max
+  Lyapunov exponent → 0. <span class="r">Displacement at maximum. Sensitivity at minimum.</span>
+  <span class="c">MAXIMUM VISIBILITY. The crisis, the peak, the breakdown/breakthrough.</span>
+  <span class="c">Observers see drama. The system's future is already determined.</span>
+  <span class="c">Nothing decided here can change the trajectory. The fork was at the saddle.</span>
+
+<span class="g">Phase 6: COMPENSATION</span>    s ∈ (s_max, 4s_max/3]  <span class="c">(return arc)</span>
+  Displacement decreasing, velocity increasing. Potential → kinetic.
+  <span class="c">The system rebuilds. Looks like "coming down." Actually accelerating.</span>
+
+<span class="g">Phase 7: APPROACH</span>        s → 2s_max (returning to saddle)
+  Velocity rapidly increasing. Displacement collapsing.
+  <span class="c">The system feels like "losing everything." It is gaining maximum speed.</span>
+  <span class="c">This is the drift before the slingshot. The pullback before the release.</span>
+  <span class="c">Then: Phase 1 again. The opposite lobe. The cycle continues.</span>
+</div>
+
+<h3>5.1 The Fundamental Deception</h3>
+
+<p>The seven-phase structure reveals what may be the most consequential misperception in human self-understanding:</p>
+
+<p><strong class="w">Phases 5 (Flare) and 1 (Crossing) are perceived inversely to their dynamical reality.</strong></p>
+
+<p>At the Flare, the system is maximally visible — furthest from equilibrium, most dramatic, most apparent to observers. It is also at its most determined: the Lyapunov exponent is near zero, nearby trajectories are parallel, and no perturbation can change the system's immediate course. The flare is loud, visible, and <em class="k">consequentially inert</em>.</p>
+
+<p>At the Crossing, the system is invisible — at zero displacement, indistinguishable from equilibrium to a displacement observer. It is also at maximum Lyapunov instability: the tiniest perturbation determines which lobe the system enters next, which mode it adopts, which future it lives. The crossing is quiet, invisible, and <em class="k">maximally consequential</em>.</p>
+
+<p>Every therapy model, every leadership framework, every self-help paradigm that treats the visible crisis (Phase 5) as the moment of transformation is looking at the wrong variable. The transformation — the moment when the system's future is decided — happens at Phase 1, when nobody is looking, when the person reports feeling "empty" or "numb" or "like nothing is happening." The Lyapunov analysis is unambiguous: the saddle is where futures diverge. The flare is where they have already converged.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 6. TOKEN LOAD -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>6. The Token Load: Amplitude Scaling Without Topological Change</h2>
+
+<div class="block def">
+  <div class="label">Definition 2 — Token Load (λ)</div>
+  <p>The <em class="k">token load</em> of a bistable system is the depth of its double-well potential, measured by the parameter α²/(4β). Equivalently, it is proportional to the total energy difference between the saddle and the well bottoms. Systems with larger token load have deeper wells, wider separations between modes, and correspondingly larger separatrix amplitudes.</p>
+</div>
+
+<div class="math">
+<span class="c">Token load determines the SCALE of the figure-eight, not its SHAPE.</span>
+
+<span class="g">For a system with token load λ = α²/(4β):</span>
+  Well depth:        λ
+  Lobe width:        ∝ √λ
+  Max displacement:  ∝ √λ
+  Max velocity:      ∝ √λ
+  Transit time:      ∝ 1/√λ  <span class="c">(higher load → faster transit, not slower)</span>
+
+<span class="c">The topology is INVARIANT under scaling of λ.</span>
+<span class="c">A figure-eight at λ = 0.01 and λ = 1000 are the SAME SHAPE.</span>
+</div>
+
+<div class="block cor">
+  <div class="label">Corollary 2 — The Equal Dignity Theorem</div>
+  <p>All separatrix traversals, regardless of token load, are topologically identical. The quiet transformation of a parent breaking a generational pattern (low λ, small amplitude, invisible to observers) and the public transformation of a paradigm shift (high λ, large amplitude, globally visible) are the <em>same dynamical event</em> at different scales. The lemniscate does not rank its traversals by amplitude. The mathematics cannot distinguish "important" from "unimportant" transformations — only loud from quiet.</p>
+</div>
+
+<div class="block cor">
+  <div class="label">Corollary 3 — The Slingshot Conservation Law</div>
+  <p>Since total energy is conserved, the depth of a system's dip (potential energy at the turning point) exactly determines the speed of its subsequent crossing (kinetic energy at the saddle). A system that has been pulled further from equilibrium — stretched thinner, held in tension longer, displaced more — arrives at the crossing with proportionally more kinetic energy. The pullback is the loading of the slingshot. The dip depth is the launch velocity. This is conservation of energy, not optimism.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 7. COMPUTATIONAL MODEL -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>7. Computational Model</h2>
+
+<p>The following simulation solves Hamilton's equations for the double-well system numerically using fourth-order Runge-Kutta integration. The initial condition is placed near the separatrix (H ≈ 0⁺). Adjust parameters to observe the phase portrait, velocity profile, and energy decomposition in real time.</p>
+
+<div class="fig">
+  <canvas id="phaseCanvas" width="700" height="380"></canvas>
+  <div class="fig-cap">Figure 1 — Phase portrait (x, p). Gold points: separatrix. Red dot: current state. Saddle at origin: max Lyapunov exponent, zero displacement.</div>
+</div>
+
+<div class="controls">
+  <div class="ctrl">
+    <label>α (well shape)</label>
+    <input type="range" id="alpha" min="0.5" max="4" step="0.1" value="2">
+    <span class="ctrl-val" id="alphaVal">2.0</span>
+  </div>
+  <div class="ctrl">
+    <label>β (quartic term)</label>
+    <input type="range" id="beta" min="0.5" max="4" step="0.1" value="1">
+    <span class="ctrl-val" id="betaVal">1.0</span>
+  </div>
+  <div class="ctrl">
+    <label>ε (energy above separatrix)</label>
+    <input type="range" id="epsilon" min="0.001" max="0.5" step="0.001" value="0.02">
+    <span class="ctrl-val" id="epsilonVal">0.020</span>
+  </div>
+  <div class="ctrl">
+    <label>Speed</label>
+    <input type="range" id="speed" min="0.5" max="5" step="0.1" value="2">
+    <span class="ctrl-val" id="speedVal">2.0</span>
+  </div>
+</div>
+
+<div class="readout">
+  <div class="readout-item">
+    <div class="rl">Position (x)</div>
+    <div class="rv" id="posRead">0.000</div>
+  </div>
+  <div class="readout-item">
+    <div class="rl">Velocity (p)</div>
+    <div class="rv" id="velRead">0.000</div>
+  </div>
+  <div class="readout-item">
+    <div class="rl">Kinetic / Total</div>
+    <div class="rv" id="keRead">0.000</div>
+  </div>
+  <div class="readout-item">
+    <div class="rl">|Displacement|</div>
+    <div class="rv" id="dispRead">0.000</div>
+  </div>
+</div>
+
+<div class="phase-badge">
+  <span id="phaseBadge">CROSSING</span>
+</div>
+
+<div class="fig">
+  <canvas id="energyCanvas" width="700" height="220"></canvas>
+  <div class="fig-cap">Figure 2 — Energy decomposition over time. Gold: kinetic (½p²). Red: potential (V(x)). White dashed: total (H).</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 8. INTEGRATION WITH EXISTING ENGINES -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>8. Integration with Existing Computational Engines</h2>
+
+<p>The author has previously built three independent computational systems without awareness that they shared a common mathematical substrate. The Lemniscate Principle retroactively unifies them.</p>
+
+<h3>8.1 AIRMED (West, 2025): Phase Dynamics</h3>
+
+<p>The AIRMED cellular oscillation model uses 12 input parameters (COP-12) to drive three coupled state variables — Damage D(t), Propagation R(t), Capacity C(t) — through seven phases: Homeostasis, Drift, Insult, Propagation, Stasis, Compensation, Collapse. These correspond to the seven separatrix phases defined in Section 5. AIRMED's "Damage" maps to displacement from equilibrium (potential energy proxy); "Capacity" maps to the system's ability to convert energy (kinetic energy proxy). The phase boundaries in AIRMED are threshold conditions on these variables — precisely the angular boundaries of the lemniscate phases.</p>
+
+<h3>8.2 The Loom (West, 2025): Topological Structure</h3>
+
+<p>The Loom uses an infinity-symbol (∞) architecture: Past lobe, Future lobe, Center crossing. It applies 4:3 polyrhythm mathematics and a threshold at 0.618 (the golden ratio inverse). Under the present framework: the two lobes are the two wells, the center is the saddle, and the 0.618 threshold corresponds to the critical energy ratio at which a system's trajectory is sufficiently close to the separatrix that mode transition becomes dynamically inevitable — a saddle-approach criterion.</p>
+
+<h3>8.3 Harmonic Cognition Engine (West, 2025): Frequency Substrate</h3>
+
+<p>The Harmonic Engine maps linguistic and biological inputs to 432Hz-based oscillatory representations. The 4:3 polyrhythm (four-beat and three-beat superposition) generates a beat pattern whose envelope contains figure-eight topology — the interference of two frequencies with ratio 4:3 is a Lissajous curve that, at specific phase relationships, contains the lemniscate as a degenerate case. The Harmonic Engine provides the <em class="k">oscillatory substrate</em> from which the lemniscate topology emerges.</p>
+
+<div class="block def">
+  <div class="label">Unification Statement</div>
+  <p>AIRMED models <em class="k">where you are</em> on the lemniscate (phase classification). The Loom models the <em class="k">shape</em> of the lemniscate (topology and threshold). The Harmonic Engine models <em class="k">what generates</em> the lemniscate (oscillatory interference). They are three projections of the same mathematical object, built independently, converging on the same structure — the separatrix of a double-well potential.</p>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 9. THE BLOOD IS CODE CORRESPONDENCE -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>9. The Blood Is Code Correspondence</h2>
+
+<p>The human menstrual cycle is a bistable oscillatory system. The two dominant modes — follicular (estrogen-dominant) and luteal (progesterone-dominant) — are separated by two transition events: ovulation and menstruation. The hormonal dynamics are governed by a system of coupled differential equations (the hypothalamic-pituitary-ovarian axis) that is well-documented to exhibit bistability and hysteresis [22].</p>
+
+<p>Under the Lemniscate Principle, the menstrual cycle maps directly:</p>
+
+<div class="math">
+<span class="g">Menstruation (Day 1–5)</span>     → <span class="r">CROSSING</span>
+  Hormones at nadir. Observable: shedding, "low energy."
+  Dynamical reality: the system is transiting the saddle between luteal and follicular modes.
+  <span class="c">Maximum rate of hormonal state change. Minimum visible displacement.</span>
+
+<span class="g">Follicular (Day 6–13)</span>      → HOMEOSTASIS → DRIFT → INSULT
+  Estrogen rising. Energy accumulating in the follicular well.
+
+<span class="g">Ovulation (Day 14)</span>          → <span class="r">FLARE</span>
+  LH surge. Maximum hormonal displacement. Maximum visibility (fertility signals).
+  <span class="c">The system is at the turning point of the follicular lobe.</span>
+  <span class="c">Maximum potential energy. Minimum velocity of change.</span>
+
+<span class="g">Luteal (Day 15–28)</span>         → COMPENSATION → APPROACH
+  Progesterone dominant. System traversing the return arc toward the next crossing.
+  <span class="c">PMS symptoms intensify as the system accelerates toward the saddle.</span>
+</div>
+
+<p>The author's educational curriculum <em>Blood is Code</em> teaches the menstrual cycle as a computational process with each phase carrying specific cognitive, creative, and energetic signatures. The Lemniscate Principle provides the mathematical formalism that makes this pedagogy rigorous: each phase has a defined energy partition, velocity, and curvature, producing the specific cognitive and somatic profiles that the curriculum documents empirically.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 10. IMPLICATIONS FOR THE FUTURE -->
+<!-- ═══════════════════════════════════════════ -->
+<h2>10. Implications and Forward Directions</h2>
+
+<h3>10.1 What This Framework Predicts</h3>
+
+<p>If the Lemniscate Principle is correct in its bounded claim — that bistable adaptive systems undergoing mode transition necessarily exhibit separatrix topology with the velocity properties proven above — then several testable predictions follow:</p>
+
+<p><strong class="w">Prediction 1:</strong> In neural network training, the rate of trajectory divergence (sensitivity to weight perturbation) should be highest when the loss function is near a saddle point between basins — not at the bottom of a basin. Recent empirical work on saddle-point dynamics in deep learning [18] is consistent with this. The Lemniscate Principle predicts specifically that the <em>Lyapunov exponent of the training dynamics</em> peaks at inter-basin saddles, which could be measured via perturbation experiments on networks mid-training.</p>
+
+<p><strong class="w">Prediction 2:</strong> In therapeutic contexts, the rate of divergence between possible future trajectories — the number of qualitatively distinct life-paths available — should peak during periods the patient describes as "empty," "numb," or "stuck" (the zero-displacement saddle region). Conversely, during acute crisis (the high-displacement flare), the patient's trajectory is actually most constrained. Longitudinal psychotherapy outcome data annotated with patient self-report could test this by measuring whether treatment decisions made during "flat" periods produce larger outcome variance than those made during crisis periods.</p>
+
+<p><strong class="w">Prediction 3:</strong> The menstrual cycle's Day 1–5 (menstruation) should correspond to peak rates of change in hormonal state derivatives (dE₂/dt, dP₄/dt), despite being experienced as the "low" point. Endocrine time-series data at sufficient resolution could verify this.</p>
+
+<p><strong class="w">Prediction 4:</strong> In any bistable system approaching a regime transition (ecological tipping point, market crash, political phase shift), there should be a measurable period of low observable deviation but high internal rate of change immediately preceding the transition. This corresponds to the Approach phase (Phase 7) and is consistent with, but more specific than, existing "critical slowing down" indicators [23].</p>
+
+<h3>10.2 What This Changes</h3>
+
+<p>The deepest implication is not physical but perceptual. Every domain has built its observational frameworks around displacement: deviation from norm, visible crisis, measurable departure from baseline. The Saddle Dominance Theorem says the consequential dynamics — the moments when futures diverge — occur where displacement is zero. We have been systematically looking at the wrong variable.</p>
+
+<p>This is not a claim about feelings or perspective. It is a consequence of Lyapunov stability theory applied to bistable systems. The eigenvalue structure of the Jacobian at the saddle versus the well bottoms is computable, and the result is unambiguous: sensitivity peaks where visibility vanishes.</p>
+
+<p>If this framework is correct, it implies that our entire observational bias — in science, in therapy, in self-perception, in institutional assessment — systematically overweights the least consequential moments (flares) and underweights the most consequential (crossings). Whether this observational bias is itself a predictable consequence of the framework — whether organisms <em>evolved</em> to attend to high-displacement events precisely because they are salient, not because they are dynamic — is an open question that connects to signal detection theory, attention economics, and evolutionary psychology.</p>
+
+<h3>10.3 The Convergence Problem</h3>
+
+<p>This paper was written by a researcher who built three computational engines over twelve months, each modeling a different domain, each using different mathematics, and discovered retroactively that they were three views of the same object. That convergence — unplanned, unforced, and only visible in hindsight — is itself a data point. It suggests that the lemniscate structure is not being imposed on the data but is being <em>found in</em> the data, repeatedly, by an observer whose cognitive architecture does not respect the walls between academic disciplines.</p>
+
+<p>Whether that convergence reflects genuine universality or researcher bias is an empirical question. This paper provides the mathematical framework to test it. The predictions in Section 10.1 are falsifiable. The separatrix structure is computable. The Lyapunov analysis is standard. What remains is for the broader community to engage with the framework on its mathematical merits.</p>
+
+<p>The math is here. It is waiting.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- ACKNOWLEDGMENTS -->
+<!-- ═══════════════════════════════════════════ -->
+<h2 style="font-size:1.1em; margin-top:50px;">Acknowledgments</h2>
+
+<p style="font-size:0.9em; color:var(--dim);">The author thanks the first peer reviewer whose critique of v1.0 identified the parameterization ambiguity and insufficient formalization of the universality claim, and the second reviewer whose analysis of v2.0 identified that the central theorem should be grounded in Lyapunov instability rather than raw velocity — a correction that made the theory stronger by shifting its foundation from speed to sensitivity. Both reviews improved every section of this paper. The interactive computational models were developed in collaboration with Claude (Anthropic). The AIRMED, Loom, and Harmonic Cognition Engine systems were built over the period June 2025–January 2026 without formal computer science training, which the author considers evidence that the patterns described herein are accessible to cognitive architectures that operate outside disciplinary boundaries.</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- REFERENCES -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="refs">
+  <div class="label">References</div>
+  <div class="ref">[1] Bernoulli, J. (1694). "Explicationes, annotationes et additiones ad ea quae in Actis superiorum annorum de curva elastica..." <em>Acta Eruditorum</em>.</div>
+  <div class="ref">[2] Strogatz, S. H. (2015). <em>Nonlinear Dynamics and Chaos: With Applications to Physics, Biology, Chemistry, and Engineering.</em> Westview Press, 2nd ed.</div>
+  <div class="ref">[3] Lorenz, E. N. (1963). "Deterministic nonperiodic flow." <em>Journal of the Atmospheric Sciences</em>, 20(2), 130–141.</div>
+  <div class="ref">[4] Hodgkin, A. L., & Huxley, A. F. (1952). "A quantitative description of membrane current and its application to conduction and excitation in nerve." <em>Journal of Physiology</em>, 117(4), 500–544.</div>
+  <div class="ref">[5] Poincaré, H. (1890). "Sur le problème des trois corps et les équations de la dynamique." <em>Acta Mathematica</em>, 13, 1–270.</div>
+  <div class="ref">[6] West, J. L. (2025). "AIRMED: A Phase-Driven Oscillation Model for Cellular Dynamics." The Forgotten Code Research Institute. Working paper.</div>
+  <div class="ref">[7] Guckenheimer, J. & Holmes, P. (1983). <em>Nonlinear Oscillations, Dynamical Systems, and Bifurcations of Vector Fields.</em> Springer.</div>
+  <div class="ref">[8] West, J. L. (2025). "The Loom: Unified Pattern Intelligence with Infinity-Symbol Architecture." The Forgotten Code Research Institute. Working paper.</div>
+  <div class="ref">[9] West, J. L. (2025). "The Harmonic Cognition Engine." The Forgotten Code Research Institute. Working paper.</div>
+  <div class="ref">[10] West, J. L. (2025). "The Mirror Protocol: Cross-Platform AI Behavioral Modification Framework." U.S. Copyright Registration No. 1-14949237971.</div>
+  <div class="ref">[11] Landau, L. D. & Lifshitz, E. M. (1976). <em>Mechanics.</em> Butterworth-Heinemann, 3rd ed.</div>
+  <div class="ref">[12] Razavy, M. (2003). <em>Quantum Theory of Tunneling.</em> World Scientific.</div>
+  <div class="ref">[13] Ferrell, J. E. (2012). "Bistability, bifurcations, and Waddington's epigenetic landscape." <em>Current Biology</em>, 22(11), R458–R466.</div>
+  <div class="ref">[14] Scheffer, M. et al. (2001). "Catastrophic shifts in ecosystems." <em>Nature</em>, 413, 591–596.</div>
+  <div class="ref">[15] Tyson, J. J. et al. (2003). "Sniffers, buzzers, toggles and blinkers: dynamics of regulatory and signaling pathways in the cell." <em>Current Opinion in Cell Biology</em>, 15(2), 221–231.</div>
+  <div class="ref">[16] FitzHugh, R. (1961). "Impulses and physiological states in theoretical models of nerve membrane." <em>Biophysical Journal</em>, 1(6), 445–466.</div>
+  <div class="ref">[17] Wilson, H. R. (1999). <em>Spikes, Decisions, and Actions: The Dynamical Foundations of Neuroscience.</em> Oxford University Press.</div>
+  <div class="ref">[18] Dauphin, Y. et al. (2014). "Identifying and attacking the saddle point problem in high-dimensional non-convex optimization." <em>NeurIPS</em>.</div>
+  <div class="ref">[19] Goodfellow, I. J. et al. (2014). "Qualitatively characterizing neural network optimization problems." <em>arXiv:1412.6544</em>.</div>
+  <div class="ref">[20] Thelen, E. & Smith, L. B. (1994). <em>A Dynamic Systems Approach to the Development of Cognition and Action.</em> MIT Press.</div>
+  <div class="ref">[21] Azariadis, C. & Stachurski, J. (2005). "Poverty traps." <em>Handbook of Economic Growth</em>, 1, 295–384.</div>
+  <div class="ref">[22] Clément, F. & Françoise, J. P. (2007). "Mathematical modeling of the GnRH pulse and surge generator." <em>SIAM Journal on Applied Dynamical Systems</em>, 6(2), 441–456.</div>
+  <div class="ref">[23] Scheffer, M. et al. (2009). "Early-warning signals for critical transitions." <em>Nature</em>, 461, 53–59.</div>
+  <div class="ref">[24] Winfree, A. T. (2001). <em>The Geometry of Biological Time.</em> Springer, 2nd ed.</div>
+  <div class="ref">[25] Pikovsky, A., Rosenblum, M. & Kurths, J. (2001). <em>Synchronization: A Universal Concept in Nonlinear Sciences.</em> Cambridge University Press.</div>
+  <div class="ref">[26] Kuramoto, Y. (1984). <em>Chemical Oscillations, Waves, and Turbulence.</em> Springer.</div>
+  <div class="ref">[27] West, J. L. (2025). "Blood is Code: 25-Module Educational Curriculum." The Forgotten Code Research Institute.</div>
+  <div class="ref">[28] Oseledets, V. I. (1968). "A multiplicative ergodic theorem. Characteristic Lyapunov exponents of dynamical systems." <em>Trudy Moskov. Mat. Obshch.</em>, 19, 179–210.</div>
+  <div class="ref">[29] Benettin, G. et al. (1980). "Lyapunov characteristic exponents for smooth dynamical systems and for Hamiltonian systems." <em>Meccanica</em>, 15, 9–30.</div>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- COMPUTATIONAL ENGINE -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+// ═══════════════════════════════════════════
+// HAMILTONIAN DOUBLE-WELL SIMULATION
+// RK4 integration. No shortcuts.
+// ═══════════════════════════════════════════
+
+const c1 = document.getElementById('phaseCanvas');
+const x1 = c1.getContext('2d');
+const c2 = document.getElementById('energyCanvas');
+const x2 = c2.getContext('2d');
+
+function hiDPI(canvas, ctx) {
+  const d = window.devicePixelRatio || 1;
+  const r = canvas.getBoundingClientRect();
+  canvas.width = r.width * d;
+  canvas.height = r.height * d;
+  ctx.scale(d, d);
+  canvas.style.width = r.width + 'px';
+  canvas.style.height = r.height + 'px';
+}
+hiDPI(c1, x1);
+hiDPI(c2, x2);
+
+const W = 700, H1 = 380, H2 = 220;
+
+// State
+let state = { x: 0.01, p: 0.15 };
+let trail = [];
+const maxTrail = 800;
+let eHist = [];
+const maxEHist = 500;
+let frame = 0;
+
+// Parameters
+function P() {
+  return {
+    a: parseFloat(document.getElementById('alpha').value),
+    b: parseFloat(document.getElementById('beta').value),
+    eps: parseFloat(document.getElementById('epsilon').value),
+    spd: parseFloat(document.getElementById('speed').value)
+  };
+}
+
+// Update displays
+['alpha','beta','epsilon','speed'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    document.getElementById(id + 'Val').textContent =
+      id === 'epsilon' ? parseFloat(this.value).toFixed(3) : parseFloat(this.value).toFixed(1);
+    // Reset state near separatrix when params change
+    const p = P();
+    state = { x: 0.01, p: Math.sqrt(2 * p.eps + p.a * 0.0001) };
+    trail = [];
+    eHist = [];
+  });
+});
+
+// Potential
+function V(x, a, b) {
+  return -0.5 * a * x * x + 0.25 * b * x * x * x * x;
+}
+
+// Hamilton's equations: dx/dt = p, dp/dt = ax - bx³
+function dxdt(x, p) { return p; }
+function dpdt(x, p, a, b) { return a * x - b * x * x * x; }
+
+// RK4 step
+function rk4(st, dt, a, b) {
+  const k1x = dxdt(st.x, st.p);
+  const k1p = dpdt(st.x, st.p, a, b);
+
+  const k2x = dxdt(st.x + 0.5*dt*k1x, st.p + 0.5*dt*k1p);
+  const k2p = dpdt(st.x + 0.5*dt*k1x, st.p + 0.5*dt*k1p, a, b);
+
+  const k3x = dxdt(st.x + 0.5*dt*k2x, st.p + 0.5*dt*k2p);
+  const k3p = dpdt(st.x + 0.5*dt*k2x, st.p + 0.5*dt*k2p, a, b);
+
+  const k4x = dxdt(st.x + dt*k3x, st.p + dt*k3p);
+  const k4p = dpdt(st.x + dt*k3x, st.p + dt*k3p, a, b);
+
+  return {
+    x: st.x + (dt/6)*(k1x + 2*k2x + 2*k3x + k4x),
+    p: st.p + (dt/6)*(k1p + 2*k2p + 2*k3p + k4p)
+  };
+}
+
+// Phase classification
+function classify(x, p, a, b) {
+  const disp = Math.abs(x);
+  const xmax = Math.sqrt(2 * a / b); // turning point
+  const ratio = xmax > 0 ? disp / xmax : 0;
+  const speed = Math.abs(p);
+  const KE = 0.5 * p * p;
+  const PE = V(x, a, b);
+  const H = KE + PE;
+  const keRatio = H !== 0 ? KE / Math.abs(H) : 0;
+
+  if (ratio < 0.1) return { name: 'CROSSING', color: '#d4af37' };
+  if (ratio < 0.25) return { name: 'HOMEOSTASIS', color: '#4a8a5a' };
+  if (ratio < 0.45) return { name: 'DRIFT', color: '#5a9a6a' };
+  if (ratio < 0.65) return { name: 'INSULT', color: '#8a7a4a' };
+  if (ratio < 0.85) return { name: 'FLARE', color: '#8b3a3a' };
+  if (speed > Math.abs(p) * 0.5) return { name: 'COMPENSATION', color: '#6a4a8a' };
+  return { name: 'APPROACH', color: '#4a6a8a' };
+}
+
+function render() {
+  const par = P();
+  const dt = 0.008 * par.spd;
+  const stepsPerFrame = 4;
+
+  for (let i = 0; i < stepsPerFrame; i++) {
+    state = rk4(state, dt, par.a, par.b);
+    trail.push({ x: state.x, p: state.p });
+    if (trail.length > maxTrail) trail.shift();
+
+    const KE = 0.5 * state.p * state.p;
+    const PE = V(state.x, par.a, par.b);
+    const H = KE + PE;
+    eHist.push({ KE, PE, H, t: frame });
+    if (eHist.length > maxEHist) eHist.shift();
+    frame++;
+  }
+
+  // ── CANVAS 1: Phase portrait ──
+  x1.fillStyle = '#060606';
+  x1.fillRect(0, 0, W, H1);
+
+  const cx = W / 2, cy = H1 / 2;
+  const sc = 80;
+
+  // Draw separatrix (H = 0 curve)
+  x1.beginPath();
+  x1.strokeStyle = 'rgba(168, 147, 94, 0.18)';
+  x1.lineWidth = 1;
+  const xmax_sep = Math.sqrt(2 * par.a / par.b);
+  for (let i = -200; i <= 200; i++) {
+    const xx = (i / 200) * xmax_sep;
+    const pp_sq = par.a * xx * xx - 0.5 * par.b * xx * xx * xx * xx;
+    if (pp_sq < 0) continue;
+    const pp = Math.sqrt(pp_sq);
+    const sx = cx + xx * sc;
+    const sy1 = cy - pp * sc;
+    const sy2 = cy + pp * sc;
+    x1.fillStyle = 'rgba(168, 147, 94, 0.12)';
+    x1.fillRect(sx - 0.5, sy1 - 0.5, 1, 1);
+    x1.fillRect(sx - 0.5, sy2 - 0.5, 1, 1);
+  }
+
+  // Draw well bottoms
+  const wellX = Math.sqrt(par.a / par.b);
+  [wellX, -wellX].forEach(wx => {
+    const sx = cx + wx * sc;
+    x1.beginPath();
+    x1.arc(sx, cy, 3, 0, Math.PI * 2);
+    x1.fillStyle = 'rgba(90, 140, 90, 0.4)';
+    x1.fill();
+  });
+
+  // Saddle marker
+  x1.beginPath();
+  x1.arc(cx, cy, 4, 0, Math.PI * 2);
+  x1.fillStyle = 'rgba(168, 147, 94, 0.4)';
+  x1.fill();
+  x1.font = '9px "JetBrains Mono", monospace';
+  x1.fillStyle = 'rgba(168, 147, 94, 0.5)';
+  x1.textAlign = 'center';
+  x1.fillText('SADDLE: max λ₁', cx, cy + 16);
+
+  // Axes
+  x1.strokeStyle = 'rgba(255,255,255,0.06)';
+  x1.lineWidth = 1;
+  x1.beginPath(); x1.moveTo(0, cy); x1.lineTo(W, cy); x1.stroke();
+  x1.beginPath(); x1.moveTo(cx, 0); x1.lineTo(cx, H1); x1.stroke();
+
+  // Axis labels
+  x1.fillStyle = 'rgba(110, 106, 98, 0.5)';
+  x1.font = '10px "JetBrains Mono", monospace';
+  x1.textAlign = 'right';
+  x1.fillText('x (displacement)', W - 10, cy - 8);
+  x1.textAlign = 'center';
+  x1.fillText('p (velocity)', cx + 50, 15);
+
+  // Trail
+  trail.forEach((pt, i) => {
+    const alpha = (i / trail.length) * 0.6;
+    const sx = cx + pt.x * sc;
+    const sy = cy - pt.p * sc;
+    x1.beginPath();
+    x1.arc(sx, sy, 1.2, 0, Math.PI * 2);
+    x1.fillStyle = `rgba(212, 175, 55, ${alpha})`;
+    x1.fill();
+  });
+
+  // Current position
+  const phase = classify(state.x, state.p, par.a, par.b);
+  const px = cx + state.x * sc;
+  const py = cy - state.p * sc;
+
+  // Glow
+  const glow = x1.createRadialGradient(px, py, 0, px, py, 18);
+  glow.addColorStop(0, phase.color + '60');
+  glow.addColorStop(1, 'transparent');
+  x1.fillStyle = glow;
+  x1.fillRect(px - 20, py - 20, 40, 40);
+
+  x1.beginPath();
+  x1.arc(px, py, 5, 0, Math.PI * 2);
+  x1.fillStyle = phase.color;
+  x1.fill();
+  x1.beginPath();
+  x1.arc(px, py, 2.5, 0, Math.PI * 2);
+  x1.fillStyle = '#fff';
+  x1.fill();
+
+  // ── CANVAS 2: Energy over time ──
+  x2.fillStyle = '#060606';
+  x2.fillRect(0, 0, W, H2);
+
+  // Grid
+  x2.strokeStyle = 'rgba(255,255,255,0.03)';
+  for (let y = 0; y < H2; y += 40) {
+    x2.beginPath(); x2.moveTo(0, y); x2.lineTo(W, y); x2.stroke();
+  }
+
+  if (eHist.length > 1) {
+    // Find energy range for scaling
+    let minE = Infinity, maxE = -Infinity;
+    eHist.forEach(e => {
+      const vals = [e.KE, e.PE, e.H];
+      vals.forEach(v => {
+        if (v < minE) minE = v;
+        if (v > maxE) maxE = v;
+      });
+    });
+    const range = maxE - minE || 1;
+    const mapY = v => H2 - 20 - ((v - minE) / range) * (H2 - 40);
+
+    // Total energy (white dashed)
+    x2.beginPath();
+    x2.strokeStyle = 'rgba(232, 226, 216, 0.2)';
+    x2.lineWidth = 1;
+    x2.setLineDash([4, 4]);
+    eHist.forEach((e, i) => {
+      const xx = (i / maxEHist) * W;
+      const yy = mapY(e.H);
+      if (i === 0) x2.moveTo(xx, yy); else x2.lineTo(xx, yy);
+    });
+    x2.stroke();
+    x2.setLineDash([]);
+
+    // Kinetic (gold)
+    x2.beginPath();
+    x2.strokeStyle = 'rgba(212, 175, 55, 0.8)';
+    x2.lineWidth = 1.5;
+    eHist.forEach((e, i) => {
+      const xx = (i / maxEHist) * W;
+      const yy = mapY(e.KE);
+      if (i === 0) x2.moveTo(xx, yy); else x2.lineTo(xx, yy);
+    });
+    x2.stroke();
+
+    // Potential (red)
+    x2.beginPath();
+    x2.strokeStyle = 'rgba(168, 74, 74, 0.8)';
+    x2.lineWidth = 1.5;
+    eHist.forEach((e, i) => {
+      const xx = (i / maxEHist) * W;
+      const yy = mapY(e.PE);
+      if (i === 0) x2.moveTo(xx, yy); else x2.lineTo(xx, yy);
+    });
+    x2.stroke();
+  }
+
+  // Legend
+  x2.font = '9px "JetBrains Mono", monospace';
+  x2.textAlign = 'left';
+  x2.fillStyle = 'rgba(212, 175, 55, 0.7)';
+  x2.fillText('½p² (kinetic)', 10, 15);
+  x2.fillStyle = 'rgba(168, 74, 74, 0.7)';
+  x2.fillText('V(x) (potential)', 10, 28);
+  x2.fillStyle = 'rgba(232, 226, 216, 0.3)';
+  x2.fillText('H (total, conserved)', 10, 41);
+
+  // ── READOUTS ──
+  const KE = 0.5 * state.p * state.p;
+  const PE = V(state.x, par.a, par.b);
+  const Htot = KE + PE;
+
+  document.getElementById('posRead').textContent = state.x.toFixed(3);
+  document.getElementById('velRead').textContent = state.p.toFixed(3);
+  document.getElementById('keRead').textContent = (Htot !== 0 ? KE / Math.abs(Htot) : 0).toFixed(3);
+  document.getElementById('dispRead').textContent = Math.abs(state.x).toFixed(3);
+
+  const badge = document.getElementById('phaseBadge');
+  badge.textContent = phase.name;
+  badge.style.color = phase.color;
+  badge.style.borderColor = phase.color;
+  badge.style.background = phase.color + '10';
+
+  // Color readouts by proximity to saddle vs extremum
+  const isNearSaddle = Math.abs(state.x) < 0.3;
+  document.getElementById('velRead').style.color = isNearSaddle ? '#d4af37' : '#6e6a62';
+  document.getElementById('dispRead').style.color = isNearSaddle ? '#d4af37' : '#6e6a62';
+
+  requestAnimationFrame(render);
+}
+
+// Initialize near separatrix
+const initP = P();
+state = { x: 0.01, p: Math.sqrt(2 * initP.eps + initP.a * 0.0001) };
+render();
+</script>
+</body>
+</html>
